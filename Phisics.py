@@ -26,7 +26,6 @@ class Physics:
             col = [j for j in range(len(self.Moles)) if i != j and self.Moles[i].x == self.Moles[j].x and self.Moles[i].y == self.Moles[j].y]
             if col is not []:
                 collision.extend(col)
-        print(collision)
         return collision
 
     def get_moles(self):

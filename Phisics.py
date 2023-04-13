@@ -10,26 +10,51 @@ class Physics:
     def __init__(self, n: int, V_global: float) -> None:
         self.N = n
         self.Vg = V_global
-        self.Moles = [Mole(V_global) for _ in range(n)]
+        self.Moles = [Mole(self.Vg) for _ in range(n)]
         for i in range(len(self.Moles)):
             self.Moles[i].init_position()
 
-        collide = self.get_collision_idx()
+        collide = self.get_collision_idx(self.Moles)
         while(len(collide) != 0):
             for j in range(len(collide)):
                 self.Moles[j].init_position()
-            collide = self.get_collision_idx()
+            collide = self.get_collision_idx(self.Moles)
 
-    def get_collision_idx(self) -> list[int]:
+    def get_collision_idx(self, mole_list) -> list[int]:
         collision = []
-        for i in range(len(self.Moles)):
-            col = [j for j in range(len(self.Moles)) if i != j and self.Moles[i].x == self.Moles[j].x and self.Moles[i].y == self.Moles[j].y]
+        for i in range(len(mole_list)):
+            col = [j for j in range(len(mole_list)) if i != j and mole_list[i].x == mole_list[j].x and mole_list[i].y == mole_list[j].y]
             if col is not []:
                 collision.extend(col)
         return collision
 
     def get_moles(self):
         return self.Moles
+
+    def addMoles(self, n):
+        new_moles = [Mole(self.Vg) for _ in range(n)]
+        for i in range(len(new_moles)):
+            new_moles[i].init_position()
+        
+        collide = self.get_collision_idx(new_moles)
+        while(len(collide) != 0):
+            for j in range(len(collide)):
+                new_moles[j].init_position()
+            collide = self.get_collision_idx(new_moles)
+        self.Moles.extend(new_moles)
+        self.N += n
+
+    def delMoles(self, n):
+        self.Moles = self.Moles[0:self.N-n]
+        self.N -= n
+        
+
+
+    def setMoles(self, n: int) -> None:
+        if n > self.N:
+            self.addMoles(n-self.N)
+        elif n < self.N:
+            self.delMoles(self.N-n)
 
 
 class Mole:

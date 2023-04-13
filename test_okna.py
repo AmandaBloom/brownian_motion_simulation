@@ -16,10 +16,14 @@ class MainWindow(QMainWindow):
         super().__init__(parent)
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
-
+        self.ph = Physics(self.get_mole_count(), self.get_global_speed())
+        self.Moles = self.ph.get_moles()
+        self.d = Drawer(self.ui.label_painter)
+        
         # Labels initialization
         self.set_V()
         self.set_N()
+
 
         # Asyncronic connection label <-> slider
         self.ui.mole_slider.valueChanged.connect(self.set_N)
@@ -30,18 +34,8 @@ class MainWindow(QMainWindow):
         icon.addFile(u"diglet_logo.png", QSize(), QIcon.Normal, QIcon.Off)
         self.setWindowIcon(icon)
 
-        ph = Physics(self.get_mole_count(), self.get_global_speed())
-        Moles = ph.get_moles()
 
-        d = Drawer(self.ui.label_painter)
-        for i in range(len(Moles)):
-            d.drawCircle(Moles[i].x, Moles[i].y, Moles[i].r)
-        
 
-        # d = Drawer(self.ui.label_painter)
-        # d.drawCircle(100, 100, 3)
-        # d.drawCircle(120, 100, 3)
-        #d.clearCanvas()
       
     def set_V(self):
         self.ui.label_v.setText(str(self.get_global_speed()))
@@ -49,7 +43,9 @@ class MainWindow(QMainWindow):
 
     def set_N(self):
         self.ui.label_n.setText(str(self.get_mole_count()))
-        #self.ph.setN(self.ui.mole_slider.value())
+        self.ph.setMoles(self.get_mole_count())
+        self.Moles = self.ph.get_moles()
+        self.draw_moles()
 
     def get_mole_count(self) -> int:
         return self.ui.mole_slider.value()
@@ -57,6 +53,12 @@ class MainWindow(QMainWindow):
     def get_global_speed(self) -> float:
         return self.ui.speed_slider.value()
 
+    def draw_moles(self) -> None:
+        self.d.clearCanvas()
+        for i in range(len(self.Moles)):
+            self.d.drawCircle(self.Moles[i].x, self.Moles[i].y, self.Moles[i].r)
+        self.d.refresh()
+        
 
 def guiMain(args):
     app = QApplication(args)

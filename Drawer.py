@@ -21,9 +21,6 @@ class Drawer:
         self.label.setPixmap(self.canvas)
         self.painter = QPainter(self.label.pixmap())
 
-    def refresh(self):
-        self.label.setPixmap(self.label.pixmap())
-
     def drawCircles(self, point_list) -> None:
         for point in point_list:
             self.drawCircle(point.x, point.y, point.r)

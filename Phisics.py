@@ -31,7 +31,7 @@ class Physics:
         collide = self.getCollisionIdx(mole_list)
         while(len(collide) != 0):
             for j in range(len(collide)):
-                mole_list[j].init_position()
+                mole_list[j].initPosition()
             collide = self.getCollisionIdx(mole_list)
 
     def getMoles(self):
@@ -90,38 +90,40 @@ class Mole:
         self.Vx = self.Vg*math.cos(self.angle)
 
     def setMoleSpeed(self, v):
-        self.Vg = v
+        self.Vg = math.copysign(v, self.Vg)
         self.Vy = v*math.sin(self.angle)
         self.Vx = v*math.cos(self.angle)
 
     def moveMole(self):
         self.dx = 1/FREQUENCY*self.Vx
         self.dy = 1/FREQUENCY*self.Vy
+        # Molecule meets right/left wall
         if self.x+self.dx+MOLE_RADIUS >= SCREEN_WIDTH and self.Vx > 0:
             s = abs(1/FREQUENCY*self.Vx)
             self.dx = SCREEN_WIDTH - (self.x + MOLE_RADIUS)
             self.x = round(SCREEN_WIDTH - (s-self.dx))
             self.Vx *= -1
+            self.angle = math.pi - self.angle
         elif self.x+self.dx-MOLE_RADIUS <= 0 and self.Vx < 0:
             s = abs(1/FREQUENCY*self.Vx)
             self.dx = self.x-MOLE_RADIUS
             self.x = round(s-self.dx)
             self.Vx *= -1
+            self.angle = math.pi - self.angle
         else:
             self.x += round(self.dx)
-
+        # Molecule meets upper/lower wall
         if self.y+self.dy+MOLE_RADIUS >= SCREEN_HEIGHT and self.Vy > 0:
             s = abs(1/FREQUENCY*self.Vy)
             self.dy = SCREEN_HEIGHT - (self.y + MOLE_RADIUS)
             self.y = round(SCREEN_HEIGHT - (s-self.dy))
             self.Vy *= -1
+            self.angle = 2*math.pi - self.angle
         elif self.y+self.dy-MOLE_RADIUS <= 0 and self.Vy < 0:
             s = abs(1/FREQUENCY*self.Vy)
             self.dy = self.y-MOLE_RADIUS
             self.y = round(s-self.dy)
             self.Vy *= -1
+            self.angle = 2*math.pi - self.angle
         else:
             self.y += round(self.dy)
-
-        # self.x += round(self.dx)
-        # self.y += round(self.dy)

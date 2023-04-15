@@ -1,6 +1,6 @@
 from window_ui import Ui_MainWindow
 from PyQt5.QtWidgets import *
-from PyQt5.QtGui import QIcon, QColor, QImage, QPixmap, QPen, QPainter
+from PyQt5.QtGui import QIcon, QColor, QImage, QPixmap, QPen, QPainter, QBrush
 from PyQt5.QtCore import pyqtSlot, Qt, QTimer, QTime
 from Drawer import Drawer
 from Phisics import Physics
@@ -59,7 +59,7 @@ class MainWindow(QMainWindow):
     def drawMoles(self) -> None:
         self.d.clearCanvas()
         for i in range(len(self.Moles)):
-            self.d.drawCircle(self.Moles[i].x, self.Moles[i].y, self.Moles[i].r)
+            self.d.drawCircle(self.Moles[i].x, self.Moles[i].y, self.Moles[i].r, QBrush(Qt.red))
         
     def doLifeCycle(self) -> None:
         self.ph.moveMoles()

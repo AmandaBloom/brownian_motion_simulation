@@ -38,9 +38,6 @@ class MainWindow(QMainWindow):
         # Init Life
         self.setV()
 
-        self.ui.mole_slider.valueChanged.disconnect()
-        self.ui.speed_slider.valueChanged.disconnect()
-        self.ui.ResetButton.clicked.disconnect()
     
     def setV(self) -> None:
         self.ui.label_v.setText(str(self.getGlobalSpeed()))

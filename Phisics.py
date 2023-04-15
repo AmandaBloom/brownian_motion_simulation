@@ -16,15 +16,15 @@ class Physics:
         self.N = n
         self.Vg = V_global
         self.Moles = [Mole(self.Vg) for _ in range(n)]
-        for i in range(len(self.Moles)):
-            self.Moles[i].initPosition()
+        for mole in self.Moles:
+            mole.initPosition()
         self.checkInitCollisions(self.Moles)
 
 
     def getCollisionIdx(self, mole_list: list['Mole']) -> list[int]:
         collision = []
-        for i in range(len(mole_list)):
-            col = [j for j in range(len(mole_list)) if i != j and mole_list[i].x == mole_list[j].x and mole_list[i].y == mole_list[j].y]
+        for mole_i in mole_list:
+            col = [mole_j for mole_j in mole_list if mole_i != mole_j and mole_i.x == mole_j.x and mole_i.y == mole_j.y]
             if col is not []:
                 collision.extend(col)
         return collision
@@ -32,8 +32,8 @@ class Physics:
     def checkInitCollisions(self, mole_list: list['Mole']) -> None:
         collide = self.getCollisionIdx(mole_list)
         while(len(collide) != 0):
-            for j in range(len(collide)):
-                mole_list[j].initPosition()
+            for colider in collide:
+                colider.initPosition()
             collide = self.getCollisionIdx(mole_list)
 
     def getMoles(self) -> list['Mole']:
@@ -44,8 +44,8 @@ class Physics:
 
     def addMoles(self, n: int) -> None:
         new_moles = [Mole(self.Vg) for _ in range(n)]
-        for i in range(len(new_moles)):
-            new_moles[i].initPosition()       
+        for mole in new_moles:
+            mole.initPosition()       
         self.checkInitCollisions(new_moles)
         self.Moles.extend(new_moles)
         self.N += n
@@ -62,13 +62,13 @@ class Physics:
             
     def setMolesSpeed(self) -> None:
         with self.lock:
-            for idx in range(len(self.Moles)):
-                self.Moles[idx].setMoleSpeed(self.Vg)   
+            for mole in self.Moles:
+                mole.setMoleSpeed(self.Vg)   
 
     def moveMoles(self) -> None:
         with self.lock:
-            for idx in range(len(self.Moles)):
-                self.Moles[idx].moveMole()
+            for mole in self.Moles:
+                mole.moveMole()
 
 #    function checkCollision(m) {
 

@@ -71,49 +71,12 @@ class Physics:
 
     def moveMoles(self) -> None:
         with self.lock:
-            for mole in self.Moles:
-                mole.moveMole()
-
-
-#    function checkCollision(m) {
-
-#   var gx = Math.floor(m.x/gridEltWidth);
-#   var gy = Math.floor(m.y/gridEltHeight);
-#   var i, j;
-
-#   // check grid squares around the molecule for collisions
-#   for (i = -1; i <= 1; i++)
-#     for (j = -1; j <= 1; j++) {
-# 	if (gx+i < 0 || gy+j < 0 ||
-# 	    gx+i >= gridWidth || gy+j >= gridHeight)
-# 	    continue;
-# 	var n = checkCollisionList(m, grid[(gx+i)+(gy+j)*gridWidth]);
-# 	if (n != null)
-# 	    return n;
-#     }
-#   return null;
-# }
-
-# function checkCollisionList(m, list) {
-#   var l = list.next;
-#   var count = 0;
-#   for (; !l.listHead; l = l.next) {
-#     if (m == l)
-# 	continue;
-#     count++;
-#     var mindist = m.r+l.r;
-#     var dx = m.x-l.x;
-#     var dy = m.y-l.y;
-#     if (dx > mindist || dy > mindist ||
-# 	dx < -mindist || dy < -mindist)
-# 	continue;
-#     var dist = Math.sqrt(dx*dx+dy*dy);
-#     if (dist > mindist)
-# 	continue;
-#     return l;
-#   }
-#   return null;
-# }
+            for mole1 in self.Moles:
+                mole1.moveMole()
+            # for mole1 in self.Moles:
+            #     for mole2 in self.Moles:
+            #         if mole1 is not mole2:
+            #             mole1.checkMolesCollision(mole2)
 
 
 class Mole:
@@ -174,3 +137,72 @@ class Mole:
             self.angle = 2 * math.pi - self.angle
         else:
             self.y += round(self.dy)
+
+    def checkMolesCollision(self, m1: "Mole") -> None:
+        if self.dx == 0 or self.dy == 0:
+            return
+        # self.dx += 0.001
+        sdx = self.dx - m1.dx
+        sx = self.x - m1.x
+        sdy = self.dy - m1.dy
+        sy = self.y - m1.y
+        mindist = self.r + m1.r
+        a = (sdx * sdx) + (sdy * sdy)
+        b = 2 * ((sx * sdx) + (sy * sdy))
+        c = (sx * sx + sy * sy) - (mindist * mindist)
+
+        if (b * b) - (4 * a * c) < 0:
+            return
+        t = (-b - math.sqrt((b * b) - (4 * a * c))) / a
+        t2 = (-b + math.sqrt((b * b) - (4 * a * c))) / a
+        if abs(t) > abs(t2):
+            t = t2
+
+        # Calculation of collision point and teleport to it
+        # Now they got 1 point in a common
+        self.x += t * self.dx
+        self.y += t * self.dy
+
+        # Calculation of vector centre to centre and its normal
+        sx = self.x - m1.x
+        sy = self.y - m1.y
+        sxynorm = math.sqrt((sx * sx) + (sy * sy))
+        sxn = sx / sxynorm
+        syn = sy / sxynorm
+
+        # Speed of mass center
+        summass = self.mass + m1.mass
+        sumdx = (self.mass * self.dx + m1.mass * m1.dx) / summass
+        sumdy = (self.mass * self.dy + m1.mass * m1.dy) / summass
+
+        # Get summary speed from moles momentum and calc vectors of
+        # where they will go
+        pn = (self.dx - sumdx) * sxn + (self.dy - sumdy) * syn
+        px = 2 * sxn * pn
+        py = 2 * syn * pn
+
+        # Substract vec from Mole momentum
+        self.dx -= px
+        self.dy -= py
+
+        mult = self.mass / m1.mass
+        m1.dx += px * mult
+        m1.dy += px * mult
+
+        # Show the mole the wae
+        if t < 0:
+            self.x -= t * self.dx
+            self.y -= t * self.dy
+        if self.x < self.r:
+            self.x = self.r
+        if self.x > SCREEN_WIDTH - self.r:
+            self.x = SCREEN_WIDTH - self.r
+        if self.y > SCREEN_HEIGHT + self.r:
+            self.y = SCREEN_HEIGHT + self.r
+        if self.y < self.r:
+            self.y = self.r
+
+        self.x = round(self.x)
+        self.y = round(self.y)
+        m1.x = round(m1.x)
+        m1.y = round(m1.y)

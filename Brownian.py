@@ -1,6 +1,6 @@
 from window_ui import Ui_MainWindow
 from PyQt5.QtWidgets import *
-from PyQt5.QtGui import QIcon, QColor, QImage, QPixmap, QPen, QPainter, QBrush
+from PyQt5.QtGui import QIcon, QColor, QImage, QPixmap, QPen, QPainter, QBrush, QCloseEvent
 from PyQt5.QtCore import pyqtSlot, Qt, QTimer, QTime
 from Drawer import Drawer
 from Phisics import Physics
@@ -29,22 +29,26 @@ class MainWindow(QMainWindow):
         # Asyncronic connection label <-> slider
         self.ui.mole_slider.valueChanged.connect(self.setN)
         self.ui.speed_slider.valueChanged.connect(self.setV)
-        self.ui.ResetButton.clicked.connect(self.doLifeCycle)
-        timer = QTimer(self)
-        timer.timeout.connect(self.doLifeCycle)  # execute `do_life_cycle`
-        timer.setInterval(10)  # 1000 = 1s
-        timer.start()
+        self.ui.ResetButton.clicked.connect(self.reset)
+        self.timer = QTimer(self)
+        self.timer.timeout.connect(self.doLifeCycle)  # execute `do_life_cycle`
+        self.timer.setInterval(10)  # 1000 = 1s
+        self.timer.start()
         
         # Init Life
         self.setV()
 
-    def setV(self):
+        self.ui.mole_slider.valueChanged.disconnect()
+        self.ui.speed_slider.valueChanged.disconnect()
+        self.ui.ResetButton.clicked.disconnect()
+    
+    def setV(self) -> None:
         self.ui.label_v.setText(str(self.getGlobalSpeed()))
         self.ph.setGlobalSpeed(self.getGlobalSpeed())
         self.ph.setMolesSpeed()
         self.drawMoles()
 
-    def setN(self):
+    def setN(self) -> None:
         self.ui.label_n.setText(str(self.getMoleCount()))
         self.ph.setMoleCount(self.getMoleCount())
         self.Moles = self.ph.getMoles()
@@ -65,8 +69,16 @@ class MainWindow(QMainWindow):
         self.ph.moveMoles()
         self.setN()
 
-    def reset(self):
-        pass
+    def reset(self) -> None:
+        self.ph.delMoles(self.getMoleCount())
+        self.ph.addMoles(self.getMoleCount())
+        self.ui.ResetButton.setEnabled(False)
+        QTimer.singleShot(500, lambda: self.ui.ResetButton.setEnabled(True))
+
+    def closeEvent(self, a0: QCloseEvent) -> None:
+        # something is not yes here
+        self.timer.stop()
+        return super().closeEvent(a0)
         
 
 def guiMain(args):

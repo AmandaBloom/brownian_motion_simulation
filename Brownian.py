@@ -1,15 +1,26 @@
 from window_ui import Ui_MainWindow
 from PyQt5.QtWidgets import *
-from PyQt5.QtGui import QIcon, QColor, QImage, QPixmap, QPen, QPainter, QBrush, QCloseEvent
+from PyQt5.QtGui import (
+    QIcon,
+    QColor,
+    QImage,
+    QPixmap,
+    QPen,
+    QPainter,
+    QBrush,
+    QCloseEvent,
+)
 from PyQt5.QtCore import pyqtSlot, Qt, QTimer, QTime
 from Drawer import Drawer
 from Phisics import Physics
 import sys
 
+
 class MainWindow(QMainWindow):
     """
     Initialization
     """
+
     def __init__(self, parent=None) -> None:
         # Setup
         super().__init__(parent)
@@ -34,11 +45,10 @@ class MainWindow(QMainWindow):
         self.timer.timeout.connect(self.doLifeCycle)  # execute `do_life_cycle`
         self.timer.setInterval(10)  # 1000 = 1s
         self.timer.start()
-        
+
         # Init Life
         self.setV()
 
-    
     def setV(self) -> None:
         self.ui.label_v.setText(str(self.getGlobalSpeed()))
         self.ph.setGlobalSpeed(self.getGlobalSpeed())
@@ -60,8 +70,10 @@ class MainWindow(QMainWindow):
     def drawMoles(self) -> None:
         self.d.clearCanvas()
         for i in range(len(self.Moles)):
-            self.d.drawCircle(self.Moles[i].x, self.Moles[i].y, self.Moles[i].r, QBrush(Qt.red))
-        
+            self.d.drawCircle(
+                self.Moles[i].x, self.Moles[i].y, self.Moles[i].r, QBrush(Qt.red)
+            )
+
     def doLifeCycle(self) -> None:
         self.ph.moveMoles()
         self.setN()
@@ -76,7 +88,7 @@ class MainWindow(QMainWindow):
         # something is not yes here
         self.timer.stop()
         return super().closeEvent(a0)
-        
+
 
 def guiMain(args):
     app = QApplication(args)

@@ -12,3 +12,5 @@ Brownian Motion Simulator
 6. you may edit test_okna.py file to change application behavior
 7. my honda eats through oil like Kononowicz
 8. enjoy!
+9. For increase code readability i used black:
+    ```pip install git+https://github.com/psf/black```

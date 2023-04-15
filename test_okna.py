@@ -17,7 +17,7 @@ class MainWindow(QMainWindow):
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
         #self.ph = Physics(self.get_mole_count(), self.get_global_speed())
-        self.ph = Physics(self.get_mole_count(), 25)
+        self.ph = Physics(self.get_mole_count(), self.get_global_speed())
         self.Moles = self.ph.get_moles()
         self.d = Drawer(self.ui.label_painter)
 
@@ -39,17 +39,16 @@ class MainWindow(QMainWindow):
 
         timer = QTimer(self)
         timer.timeout.connect(self.do_life_cycle)  # execute `display_time`
-        timer.setInterval(10)  # 1000ms = 1s
+        timer.setInterval(10)  # 1000 = 1s
         timer.start()
+        
+        self.set_V()
 
-        #self.do_life_cycle()
-
-
-
-      
     def set_V(self):
         self.ui.label_v.setText(str(self.get_global_speed()))
-        #self.ph.setV(self.ui.speed_slider.value())
+        self.ph.setGlobalSpeed(self.get_global_speed())
+        self.ph.setMolesSpeed()
+        self.draw_moles()
 
     def set_N(self):
         self.ui.label_n.setText(str(self.get_mole_count()))

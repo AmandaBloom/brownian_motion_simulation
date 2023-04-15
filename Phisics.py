@@ -1,5 +1,6 @@
 import random
 import math
+from threading import Lock
 
 FREQUENCY = 30 # Hertz
 MOLE_RADIUS = 3
@@ -9,6 +10,7 @@ SCREEN_HEIGHT = 700
 
 class Physics:
     def __init__(self, n: int, V_global: float) -> None:
+        self.lock = Lock()
         self.N = n
         self.Vg = V_global
         self.Moles = [Mole(self.Vg) for _ in range(n)]
@@ -32,9 +34,11 @@ class Physics:
                 mole_list[j].init_position()
             collide = self.get_collision_idx(mole_list)
 
-
     def get_moles(self):
         return self.Moles
+
+    def setGlobalSpeed(self, v):
+        self.Vg = v
 
     def addMoles(self, n):
         new_moles = [Mole(self.Vg) for _ in range(n)]
@@ -53,10 +57,16 @@ class Physics:
             self.addMoles(n-self.N)
         elif n < self.N:
             self.delMoles(self.N-n)
+            
+    def setMolesSpeed(self):
+        with self.lock:
+            for idx in range(len(self.Moles)):
+                self.Moles[idx].set_mole_speed(self.Vg)   
 
     def moveMoles(self):
-        for idx in range(len(self.Moles)):
-            self.Moles[idx].moveMole()
+        with self.lock:
+            for idx in range(len(self.Moles)):
+                self.Moles[idx].moveMole()
 
 
 class Mole:
@@ -66,6 +76,7 @@ class Mole:
         self.y = None
         self.r = MOLE_RADIUS
         self.mass = MOLE_MASS
+        self.angle = None
         self.dx = None
         self.dy = None
         self.Vx = None
@@ -74,9 +85,14 @@ class Mole:
     def init_position(self) -> None:
         self.x = random.randint(0+MOLE_RADIUS, SCREEN_WIDTH-MOLE_RADIUS)
         self.y = random.randint(0+MOLE_RADIUS, SCREEN_HEIGHT-MOLE_RADIUS)
-        angle = random.uniform(0, 2*math.pi)
-        self.Vx = self.Vg*math.sin(angle)
-        self.Vy = self.Vg*math.cos(angle)
+        self.angle = random.uniform(0, 2*math.pi)
+        self.Vy = self.Vg*math.sin(self.angle)
+        self.Vx = self.Vg*math.cos(self.angle)
+
+    def set_mole_speed(self, v):
+        self.Vg = v
+        self.Vy = v*math.sin(self.angle)
+        self.Vx = v*math.cos(self.angle)
 
     def moveMole(self):
         self.dx = 1/FREQUENCY*self.Vx

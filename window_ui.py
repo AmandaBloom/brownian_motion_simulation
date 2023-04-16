@@ -72,10 +72,11 @@ class Ui_MainWindow(object):
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.speed_slider.sizePolicy().hasHeightForWidth())
         self.speed_slider.setSizePolicy(sizePolicy)
-        self.speed_slider.setMinimum(25)
-        self.speed_slider.setMaximum(125)
-        self.speed_slider.setSingleStep(1)
-        self.speed_slider.setProperty("value", 50)
+        self.speed_slider.setMinimum(100)
+        self.speed_slider.setMaximum(500)
+        self.speed_slider.setSingleStep(10)
+        self.speed_slider.setPageStep(100)
+        self.speed_slider.setProperty("value", 100)
         self.speed_slider.setOrientation(QtCore.Qt.Horizontal)
         self.speed_slider.setObjectName("speed_slider")
         self.verticalLayout.addWidget(self.speed_slider)
@@ -223,8 +224,11 @@ class Ui_MainWindow(object):
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "Browniam Motion"))
-        self.TitleLabel.setText(_translate("MainWindow", "Tutaj coś o autorach i co to wgl ma robić \n"
-" dupa"))
+        self.TitleLabel.setText(_translate("MainWindow", "Browmian Motion Simulation v.1.0 \n"
+" -> same initial speed \n"
+" -> same sizes of particles \n"
+"\n"
+" by Tomasz Pawlak, Wojciech Grunwald 2023 "))
         self.ResetButton.setText(_translate("MainWindow", "Reset"))
         self.label.setText(_translate("MainWindow", "Speed"))
         self.label_2.setText(_translate("MainWindow", "Molecules"))

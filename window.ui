@@ -71,8 +71,11 @@
            </font>
           </property>
           <property name="text">
-           <string>Tutaj coś o autorach i co to wgl ma robić 
- dupa</string>
+           <string>Browmian Motion Simulation v.1.0 
+ -&gt; same initial speed 
+ -&gt; same sizes of particles 
+
+ by Tomasz Pawlak, Wojciech Grunwald 2023 </string>
           </property>
          </widget>
         </item>
@@ -129,16 +132,19 @@
            </sizepolicy>
           </property>
           <property name="minimum">
-           <number>25</number>
+           <number>100</number>
           </property>
           <property name="maximum">
-           <number>125</number>
+           <number>500</number>
           </property>
           <property name="singleStep">
-           <number>1</number>
+           <number>10</number>
+          </property>
+          <property name="pageStep">
+           <number>100</number>
           </property>
           <property name="value">
-           <number>50</number>
+           <number>100</number>
           </property>
           <property name="orientation">
            <enum>Qt::Horizontal</enum>

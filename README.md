@@ -1,4 +1,4 @@
-Brownian Motion Simulator
+Brownian Motion Simulator v.1.0
 
 ## how to basic:
 1. window manipulation:
@@ -14,3 +14,4 @@ Brownian Motion Simulator
 8. enjoy!
 9. For increase code readability i used black:
     ```pip install git+https://github.com/psf/black```
+    ```black <filename>```

@@ -29,6 +29,9 @@ class MainWindow(QMainWindow):
         self.ph = Physics(self.getMoleCount(), self.getGlobalSpeed())
         self.Moles = self.ph.getMoles()
         self.d = Drawer(self.ui.label_painter)
+        self.colours = [Qt.red, Qt.white, Qt.blue, Qt.yellow, Qt.black,
+                        Qt.darkYellow, Qt.green, Qt.magenta, Qt.cyan, Qt.gray]
+        self.ui.label_v.setText(str(self.ph.Vol))
 
         # Set App Icon xD
         self.setWindowIcon(QIcon("diglet_logo.png"))
@@ -43,23 +46,36 @@ class MainWindow(QMainWindow):
         self.ui.ResetButton.clicked.connect(self.reset)
         self.timer = QTimer(self)
         self.timer.timeout.connect(self.doLifeCycle)  # execute `do_life_cycle`
-        self.timer.setInterval(10)  # 1000 = 1s
+        self.timer.setInterval(20)  # 1000 = 1s; 20 = 1/50s
         self.timer.start()
 
         # Init Life
+        
         self.setV()
 
     def setV(self) -> None:
-        self.ui.label_v.setText(str(self.getGlobalSpeed()))
         self.ph.setGlobalSpeed(self.getGlobalSpeed())
         self.ph.setMolesSpeed()
         self.drawMoles()
+
+    def setVol(self) -> None:
+        self.ui.label_v(str(self.ph.Vol))
+
+    def setP(self) -> None:
+        pressure = self.ph.wall_momentum
+        self.ui.label_p(pressure)
 
     def setN(self) -> None:
         self.ui.label_n.setText(str(self.getMoleCount()))
         self.ph.setMoleCount(self.getMoleCount())
         self.Moles = self.ph.getMoles()
         self.drawMoles()
+
+    def setP(self) -> None:
+        self.ui.label_p.setText(str(self.ph.getWallMomentum()))
+
+    def setNT(self) -> None:
+        self.ui.label_kt.setText(str(self.ph.getKT()))
 
     def getMoleCount(self) -> int:
         return self.ui.mole_slider.value()
@@ -69,14 +85,16 @@ class MainWindow(QMainWindow):
 
     def drawMoles(self) -> None:
         self.d.clearCanvas()
-        for i in range(len(self.Moles)):
+        for mole in self.Moles:
             self.d.drawCircle(
-                self.Moles[i].x, self.Moles[i].y, self.Moles[i].r, QBrush(Qt.red)
+                mole.x, mole.y, mole.r, QBrush(self.colours[mole.color_idx])
             )
 
     def doLifeCycle(self) -> None:
         self.ph.moveMoles()
         self.setN()
+        self.setP()
+        self.setNT()
 
     def reset(self) -> None:
         self.ph.delMoles(self.getMoleCount())

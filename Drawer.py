@@ -1,4 +1,4 @@
-from PyQt5.QtGui import QPixmap, QPainter, QBrush
+from PyQt5.QtGui import QPixmap, QPainter, QBrush, QColor
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QLabel
 
@@ -17,11 +17,11 @@ class Drawer:
 
     def drawCircle(self, x: int, y: int, r: int, brush_col: QBrush) -> None:
         self.painter.setBrush(QBrush(brush_col))
-        self.painter.drawEllipse(x, y, 2 * r, 2 * r)
+        self.painter.drawEllipse(x, y, r, r)
 
     def clearCanvas(self) -> None:
         self.painter.end()
-        self.canvas.fill(Qt.white)
+        self.canvas.fill(QColor(255, 102, 179))
         self.label.setPixmap(self.canvas)
         self.painter = QPainter(self.label.pixmap())
 

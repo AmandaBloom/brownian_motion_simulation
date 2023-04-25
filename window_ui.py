@@ -19,6 +19,8 @@ class Ui_MainWindow(object):
         MainWindow.setMinimumSize(QtCore.QSize(1200, 800))
         MainWindow.setMaximumSize(QtCore.QSize(1200, 800))
         MainWindow.setCursor(QtGui.QCursor(QtCore.Qt.CrossCursor))
+        MainWindow.setAutoFillBackground(False)
+        MainWindow.setStyleSheet("background-color: rgb(170, 0, 0);")
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
         self.verticalLayout_2 = QtWidgets.QVBoxLayout(self.centralwidget)

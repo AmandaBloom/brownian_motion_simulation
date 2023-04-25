@@ -24,11 +24,9 @@ class Physics:
         self.wall_area = 2* (SCREEN_HEIGHT+SCREEN_WIDTH)
         self.wall_momentum = 0.00
         self.kT = 0
+        self.Moles = []
 
-        self.Moles = [Mole(self.Vg) for _ in range(n)]
-        for mole in self.Moles:
-            mole.initPosition()
-        self.checkInitCollisions(self.Moles)
+        self.addMoles(self.N)
 
     def getCollisionIdx(self, mole_list: list["Mole"]) -> list[int]:
         collision = []
@@ -56,10 +54,8 @@ class Physics:
         self.Vg = v
 
     def addMoles(self, n: int) -> None:
-        new_moles = [Mole(self.Vg) for _ in range(n)]
-        for mole in new_moles:
-            mole.initPosition()
-        self.checkInitCollisions(new_moles)
+        moles_init_pos = [random.sample(range(SCREEN_WIDTH), n), random.sample(range(SCREEN_WIDTH), n)]
+        new_moles = [Mole(self.Vg, moles_init_pos[0][idx], moles_init_pos[1][idx]) for idx in range(n)]
         self.Moles.extend(new_moles)
         self.N += n
 
@@ -99,8 +95,6 @@ class Physics:
         if self.lc_iter == 0 and momentum == 0:
             self.wall_momentum = momentum
 
-
-        
         for mole1 in self.Moles:
             for mole2 in self.Moles:
                 if mole1 is not mole2 and mole1.isClose2(mole2):
@@ -115,35 +109,23 @@ class Physics:
     
 
 class Mole:
-    def __init__(self, Vg: float) -> None:
+    def __init__(self, Vg: float, x: int, y: int) -> None:
         self.r = MOLE_RADIUS
         self.mass = MOLE_MASS
         self.color_idx = 0
 
         self.Vg = self.Vinit = Vg
-        self.angle = None # random.uniform(0, 2 * math.pi)
-
-        self.x = None # random.randint(0 + MOLE_RADIUS, SCREEN_WIDTH - MOLE_RADIUS)
-        self.y = None # random.randint(0 + MOLE_RADIUS, SCREEN_HEIGHT - MOLE_RADIUS)
-        
-        self.V = None
-        self.Vx = None #self.Vg * math.cos(self.angle)
-        self.Vy = None # self.Vg * math.sin(self.angle)
-
-        self.dx = None # 1 / FREQUENCY * self.Vx
-        self.dy = None # 1 / FREQUENCY * self.Vy
-
-        self.gx = None
-        self.gy = None
-
-    def initPosition(self) -> None:
-        self.x = random.randint(0 + MOLE_RADIUS, SCREEN_WIDTH - MOLE_RADIUS)
-        self.y = random.randint(0 + MOLE_RADIUS, SCREEN_HEIGHT - MOLE_RADIUS)
         self.angle = random.uniform(0, 2 * math.pi)
 
+        self.x = x
+        self.y = y
+        
         self.V = self.Vg
         self.Vy = self.V * math.sin(self.angle)
         self.Vx = self.V * math.cos(self.angle)
+
+        self.dx = None # 1 / FREQUENCY * self.Vx
+        self.dy = None # 1 / FREQUENCY * self.Vy
 
         self.gx = int(self.x/GRID_WIDTH)
         self.gy = int(self.y/GRID_HEIGHT)

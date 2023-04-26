@@ -22,7 +22,7 @@ class Physics:
         self.Vg = V_global
         self.Vol = VOLUME
         self.wall_area = 2* (SCREEN_HEIGHT+SCREEN_WIDTH)
-        self.wall_momentum = 0.00
+        self.wall_momentum = 32*[0.0]
         self.kT = 0
         self.Moles = []
         self.fps = 0
@@ -31,24 +31,24 @@ class Physics:
 
         self.addMoles(self.N)
 
-    def getCollisionIdx(self, mole_list: list["Mole"]) -> list[int]:
-        collision = []
-        for mole_i in mole_list:
-            col = [
-                mole_j
-                for mole_j in mole_list
-                if mole_i != mole_j and mole_i.x == mole_j.x and mole_i.y == mole_j.y
-            ]
-            if col is not []:
-                collision.extend(col)
-        return collision
+    # def getCollisionIdx(self, mole_list: list["Mole"]) -> list[int]:
+    #     collision = []
+    #     for mole_i in mole_list:
+    #         col = [
+    #             mole_j
+    #             for mole_j in mole_list
+    #             if mole_i != mole_j and mole_i.x == mole_j.x and mole_i.y == mole_j.y
+    #         ]
+    #         if col is not []:
+    #             collision.extend(col)
+    #     return collision
 
-    def checkInitCollisions(self, mole_list: list["Mole"]) -> None:
-        collide = self.getCollisionIdx(mole_list)
-        while len(collide) != 0:
-            for colider in collide:
-                colider.initPosition()
-            collide = self.getCollisionIdx(mole_list)
+    # def checkInitCollisions(self, mole_list: list["Mole"]) -> None:
+    #     collide = self.getCollisionIdx(mole_list)
+    #     while len(collide) != 0:
+    #         for colider in collide:
+    #             colider.initPosition()
+    #         collide = self.getCollisionIdx(mole_list)
 
     def getMoles(self) -> list["Mole"]:
         return self.Moles
@@ -77,23 +77,22 @@ class Physics:
             for mole in self.Moles:
                 mole.setMoleSpeed(self.Vg)
 
-    def moveMoles(self) -> None:
+    def doIter(self) -> None:
         self.iter += 1
         self.fps_iter += 1
         momentum = 0
-        self.kT = 0
 
         for mole1 in self.Moles:
             mole1.calcRoute()
         for mole1 in self.Moles:
             momentum += mole1.moveMole()
         if momentum != 0:
-            self.wall_momentum = momentum
+            self.wall_momentum[self.iter%len(self.wall_momentum)] = momentum
             self.lc_iter = 30
         if self.lc_iter != 0 and momentum == 0:
             self.lc_iter -= 1
         if self.lc_iter == 0 and momentum == 0:
-            self.wall_momentum = momentum
+            self.wall_momentum[self.iter%len(self.wall_momentum)] = momentum
         colliding = []
         for idx, mole1 in enumerate(self.Moles):
             for mole2 in self.Moles[idx:]:
@@ -108,16 +107,22 @@ class Physics:
         self.calcFPS()
 
     def getWallMomentum(self) -> float:
-        return "{:.2f}".format(self.wall_momentum)
+        return sum(self.wall_momentum)/len(self.wall_momentum)
     
     def getMolesEnergy(self) -> float:
         e = 0
         for mole in self.Moles:
             e += mole.getEnergy()
-        return e*1e-4
+        return e*1e-6
+    
+    def getVol(self) -> float:
+        return self.Vol
+
+    def getN(self) -> float:
+        return self.N
     
     def getKT(self) -> float:
-        return "{:.2f}".format(self.kT)
+        return self.kT
     
     def calcFPS(self):
         if (time.time() - self.start_time) > 1 :
@@ -156,7 +161,7 @@ class Mole:
         self.Vy = self.V * math.sin(self.angle)
         self.Vx = self.V * math.cos(self.angle)
 
-    def getEnergy(self):
+    def getEnergy(self) -> float:
         self.Vg = math.sqrt(self.Vx**2 + self.Vy**2)
         return 0.5 * self.mass * self.Vg * self.Vg
 
@@ -218,7 +223,7 @@ class Mole:
         hit_wall_mmnt = self.mass*self.mass*s
         return hit_wall_mmnt
 
-    def overlaps(self, m1: "Mole") -> None:
+    def overlaps(self, m1: "Mole") -> bool:
         return abs((self.y - m1.y)**2 + (self.x - m1.x)**2) <= (self.r + m1.r)**2
 
     def resolveMolesCollision(self, m1: "Mole") -> None:

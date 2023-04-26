@@ -29,8 +29,18 @@ class MainWindow(QMainWindow):
         self.ph = Physics(self.getN(), self.getGlobalSpeed())
         self.Moles = self.ph.getMoles()
         self.d = Drawer(self.ui.label_painter)
-        self.colours = [Qt.red, Qt.white, Qt.blue, Qt.yellow, Qt.black,
-                        Qt.darkYellow, Qt.green, Qt.magenta, Qt.cyan, Qt.gray]
+        self.colours = [
+            Qt.red,
+            Qt.white,
+            Qt.blue,
+            Qt.yellow,
+            Qt.black,
+            Qt.darkYellow,
+            Qt.green,
+            Qt.magenta,
+            Qt.cyan,
+            Qt.gray,
+        ]
         self.ui.label_v.setText(str(self.ph.Vol))
 
         # Set App Icon xD
@@ -45,7 +55,9 @@ class MainWindow(QMainWindow):
         self.ui.speed_slider.valueChanged.connect(self.setV)
         self.ui.ResetButton.clicked.connect(self.reset)
         self.timer = QTimer(self)
-        self.timer.timeout.connect(self.doLifeCycle)  # execute `do_life_cycle` (order 66)
+        self.timer.timeout.connect(
+            self.doLifeCycle
+        )  # execute `do_life_cycle` (order 66)
         self.timer.setInterval(20)  # 1000 = 1s; 20 = 1/50s
         self.timer.start()
         self.setV()
@@ -67,10 +79,19 @@ class MainWindow(QMainWindow):
         self.drawMoles()
 
     def setP(self) -> None:
-        self.ui.label_p.setText(str(self.ph.getWallMomentum()))
+        self.ui.label_p.setText("{:.2f}".format(self.ph.getWallMomentum()))
 
     def setKT(self) -> None:
-        self.ui.label_kt.setText(str(self.ph.getKT()))
+        self.ui.label_kt.setText("{:.2f}".format(self.ph.getKT()))
+
+    def setPVNKT(self) -> None:
+        self.ui.label_pvnkt.setText(
+            "{:.2f}".format(
+                self.ph.getWallMomentum()
+                * self.ph.getVol()
+                / (self.ph.getN() * self.ph.getKT())
+            )
+        )
 
     def setFPS(self) -> None:
         self.ui.label_fps.setText(str(self.ph.getFPS()))
@@ -89,10 +110,11 @@ class MainWindow(QMainWindow):
             )
 
     def doLifeCycle(self) -> None:
-        self.ph.moveMoles()
+        self.ph.doIter()
         self.setN()
         self.setP()
         self.setKT()
+        self.setPVNKT()
         self.setFPS()
 
     def reset(self) -> None:

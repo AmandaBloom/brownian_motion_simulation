@@ -26,7 +26,7 @@ class MainWindow(QMainWindow):
         super().__init__(parent)
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
-        self.ph = Physics(self.getMoleCount(), self.getGlobalSpeed())
+        self.ph = Physics(self.getN(), self.getGlobalSpeed())
         self.Moles = self.ph.getMoles()
         self.d = Drawer(self.ui.label_painter)
         self.colours = [Qt.red, Qt.white, Qt.blue, Qt.yellow, Qt.black,
@@ -45,39 +45,37 @@ class MainWindow(QMainWindow):
         self.ui.speed_slider.valueChanged.connect(self.setV)
         self.ui.ResetButton.clicked.connect(self.reset)
         self.timer = QTimer(self)
-        self.timer.timeout.connect(self.doLifeCycle)  # execute `do_life_cycle`
+        self.timer.timeout.connect(self.doLifeCycle)  # execute `do_life_cycle` (order 66)
         self.timer.setInterval(20)  # 1000 = 1s; 20 = 1/50s
         self.timer.start()
-
-        # Init Life
-        
         self.setV()
 
     def setV(self) -> None:
+        # set speed
         self.ph.setGlobalSpeed(self.getGlobalSpeed())
         self.ph.setMolesSpeed()
         self.drawMoles()
 
     def setVol(self) -> None:
+        # set volume of map
         self.ui.label_v(str(self.ph.Vol))
 
-    def setP(self) -> None:
-        pressure = self.ph.wall_momentum
-        self.ui.label_p(pressure)
-
     def setN(self) -> None:
-        self.ui.label_n.setText(str(self.getMoleCount()))
-        self.ph.setMoleCount(self.getMoleCount())
+        self.ui.label_n.setText(str(self.getN()))
+        self.ph.setMoleCount(self.getN())
         self.Moles = self.ph.getMoles()
         self.drawMoles()
 
     def setP(self) -> None:
         self.ui.label_p.setText(str(self.ph.getWallMomentum()))
 
-    def setNT(self) -> None:
+    def setKT(self) -> None:
         self.ui.label_kt.setText(str(self.ph.getKT()))
 
-    def getMoleCount(self) -> int:
+    def setFPS(self) -> None:
+        self.ui.label_fps.setText(str(self.ph.getFPS()))
+
+    def getN(self) -> int:
         return self.ui.mole_slider.value()
 
     def getGlobalSpeed(self) -> float:
@@ -94,11 +92,12 @@ class MainWindow(QMainWindow):
         self.ph.moveMoles()
         self.setN()
         self.setP()
-        self.setNT()
+        self.setKT()
+        self.setFPS()
 
     def reset(self) -> None:
-        self.ph.delMoles(self.getMoleCount())
-        self.ph.addMoles(self.getMoleCount())
+        self.ph.delMoles(self.getN())
+        self.ph.addMoles(self.getN())
         self.ui.ResetButton.setEnabled(False)
         QTimer.singleShot(500, lambda: self.ui.ResetButton.setEnabled(True))
 

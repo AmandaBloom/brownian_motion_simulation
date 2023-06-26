@@ -17,7 +17,18 @@ class Drawer:
 
     def drawCircle(self, x: int, y: int, r: int, brush_col: QBrush) -> None:
         self.painter.setBrush(QBrush(brush_col))
-        self.painter.drawEllipse(x, y, r, r)
+        # Check for NaN
+        if x == x and y == y and r == r:
+            self.painter.drawEllipse(x, y, r, r)
+
+    def drawLine(self, x1: int, y1: int, x2: int, y2: int, brush_col: QBrush) -> None:
+        self.painter.setBrush(QBrush(brush_col))
+        if x1 == x1 and y1 == y1 and x2 == x2 and y2 == y2:
+            self.painter.drawLine(x1, y1, x2, y2)
+
+    def stop(self):
+        self.painter.end()
+        self.canvas.fill(QColor(255, 102, 179))
 
     def clearCanvas(self) -> None:
         self.painter.end()

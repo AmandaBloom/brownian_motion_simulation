@@ -10,7 +10,7 @@ from PyQt5.QtGui import (
     QBrush,
     QCloseEvent,
 )
-from PyQt5.QtCore import pyqtSlot, Qt, QTimer, QTime
+from PyQt5.QtCore import QTimerEvent, pyqtSlot, Qt, QTimer, QTime
 from Drawer import Drawer
 from Phisics import Physics
 import sys
@@ -50,9 +50,13 @@ class MainWindow(QMainWindow):
         self.setV()
         self.setN()
 
+        # Debug of to fast value chg on mole_slider
+        self.timer_id = 0
+        self.ui.speed_slider.valueChanged.connect(self.value_changed)
+
         # Asyncronic connection label <-> slider
         self.ui.mole_slider.valueChanged.connect(self.setN)
-        self.ui.speed_slider.valueChanged.connect(self.setV)
+        # self.ui.speed_slider.valueChanged.connect(self.setV)
         self.ui.ResetButton.clicked.connect(self.reset)
         self.timer = QTimer(self)
         self.timer.timeout.connect(
@@ -60,7 +64,7 @@ class MainWindow(QMainWindow):
         )  # execute `do_life_cycle` (order 66)
         self.timer.setInterval(20)  # 1000 = 1s; 20 = 1/50s
         self.timer.start()
-        self.setV()
+        # self.setV()
 
     def setV(self) -> None:
         # set speed
@@ -109,6 +113,20 @@ class MainWindow(QMainWindow):
                 mole.x, mole.y, mole.r, QBrush(self.colours[mole.color_idx])
             )
 
+    def drawBrownianTrace(self) -> None:
+        pos = self.ph.getBrownianPositions()
+        r = round(self.ph.Brownian.r / 2)
+        if len(pos) < 2:
+            return
+        for idx in range(len(pos) - 1):
+            self.d.drawLine(
+                pos[idx][0] + r,
+                pos[idx][1] + r,
+                pos[idx + 1][0] + r,
+                pos[idx + 1][1] + r,
+                QBrush(self.colours[4]),
+            )
+
     def doLifeCycle(self) -> None:
         self.ph.doIter()
         self.setN()
@@ -116,17 +134,30 @@ class MainWindow(QMainWindow):
         self.setKT()
         self.setPVNKT()
         self.setFPS()
+        self.drawBrownianTrace()
 
     def reset(self) -> None:
         self.ph.delMoles(self.getN())
-        self.ph.addMoles(self.getN())
+        self.ph.addBrownianMole()
+        self.ph.addMoles(self.getN() - 1)
+        self.ph.clearBrownianPositions()
         self.ui.ResetButton.setEnabled(False)
         QTimer.singleShot(500, lambda: self.ui.ResetButton.setEnabled(True))
 
     def closeEvent(self, a0: QCloseEvent) -> None:
-        # something is not yes here
         self.timer.stop()
+        self.d.painter.end()
         return super().closeEvent(a0)
+
+    def timerEvent(self, ev: QTimerEvent) -> None:
+        self.killTimer(self.timer_id)
+        self.timer_id = 0
+        self.setV()
+
+    def value_changed(self) -> None:
+        if self.timer != 0:
+            self.killTimer(self.timer_id)
+        self.timer_id = self.startTimer(30)
 
 
 def guiMain(args):
